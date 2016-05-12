@@ -69,7 +69,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void goToNextActivity() {
-        boolean isUserFirst = getSharedPreferences("config", MODE_PRIVATE).getBoolean("is_user_first", false);
+        boolean isUserFirst = getSharedPreferences("config", MODE_PRIVATE).getBoolean("is_user_first", true);
         if ( isUserFirst ) {
             startActivity(new Intent(SplashActivity.this, GuideActivity.class));
         } else {
