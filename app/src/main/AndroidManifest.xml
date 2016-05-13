@@ -10,7 +10,7 @@
         <activity
             android:name=".activity.SplashActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/NoTitle">
+            android:theme="@style/FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -20,9 +20,12 @@
         <activity
             android:name=".activity.GuideActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/NoTitle">
+            android:theme="@style/FullScreen">
         </activity>
-        <activity android:name=".activity.MainActivity">
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBar">
         </activity>
     </application>
 
