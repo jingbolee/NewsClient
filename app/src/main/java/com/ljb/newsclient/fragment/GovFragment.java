@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ljb.newsclient.R;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -23,13 +25,19 @@ public class GovFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        TextView textView = new TextView(getActivity());
-        textView.setText("GovFragment");
-        return textView;
+        View view = inflater.inflate(R.layout.fragment_gov, null);
+        TextView tvTitle = (TextView) view.findViewById(R.id.tv_title);
+        tvTitle.setText(getFragmentTitle());
+        return view;
     }
 
     @Override
     public String getFragmentTitle() {
         return TITLE;
+    }
+
+    @Override
+    public void showSlideMenuIcom() {
+
     }
 }

@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.ljb.newsclient.R;
 import com.ljb.newsclient.fragment.BaseFragment;
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private RadioButton rbSetting;
     private RadioButton rbGov;
     private RadioButton rbNews;
-    private TextView tvTitle;
+//    private TextView tvTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         flContentContainer = (FrameLayout) findViewById(R.id.fl_content_container);
         rgGroup = (RadioGroup) findViewById(R.id.rg_group);
-        tvTitle = (TextView) findViewById(R.id.tv_title);
+//        tvTitle = (TextView) findViewById(R.id.tv_title);
         rbHome = (RadioButton) findViewById(R.id.rb_home);
         rbSmart = (RadioButton) findViewById(R.id.rb_smart_service);
         rbGov = (RadioButton) findViewById(R.id.rb_gov);
@@ -104,6 +103,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fl_content_container, fragment);
         transaction.commit();
-        tvTitle.setText(fragment.getFragmentTitle());
+//        tvTitle.setText(fragment.getFragmentTitle());
     }
 }

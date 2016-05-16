@@ -5,38 +5,6 @@
     android:layout_height="match_parent"
     >
 
-    <RelativeLayout
-        android:id="@+id/rl_title_bar"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/title_red_bg"
-        >
-
-        <RelativeLayout
-            android:id="@+id/rl_menu"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:background="@drawable/img_menu"
-                />
-        </RelativeLayout>
-
-
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerHorizontal="true"
-            android:gravity="center_vertical"
-            android:textColor="@android:color/white"
-            android:textSize="25sp"/>
-
-    </RelativeLayout>
 
     <RadioGroup
         android:id="@+id/rg_group"
@@ -82,5 +50,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/rg_group"
-        android:layout_below="@id/rl_title_bar"></FrameLayout>
+        ></FrameLayout>
 </RelativeLayout>
