@@ -11,7 +11,7 @@
     app:viewAbove="@layout/fragment_sliding_content"
     app:viewBehind="@layout/fragment_menu_left"
 
-    >
+>
 
 
 </com.jeremyfeinstein.slidingmenu.lib.SlidingMenu>

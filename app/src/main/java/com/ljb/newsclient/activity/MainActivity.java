@@ -1,8 +1,7 @@
 package com.ljb.newsclient.activity;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -18,7 +17,7 @@ import com.ljb.newsclient.fragment.SmartFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private FrameLayout flContentContainer;
     private RadioGroup rgGroup;
@@ -100,9 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
     //切换fragment
     private void showFragment(BaseFragment fragment, String TAG) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.fl_content_container, fragment);
         transaction.commit();
-//        tvTitle.setText(fragment.getFragmentTitle());
     }
+
+
 }

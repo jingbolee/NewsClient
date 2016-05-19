@@ -1,1 +1,3 @@
 include ':app', ':SlidingMenuLibrary'
+include ':ViewPagerIndicatorLibrary'
+include ':ViewPagerIndicatorSamples'

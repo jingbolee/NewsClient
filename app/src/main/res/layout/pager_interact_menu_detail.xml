@@ -4,14 +4,11 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <include layout="@layout/item_title_bar"
-    ></include>
-
-    <com.ljb.newsclient.view.ToScrollViewPager
-        android:id="@+id/vp_news_menu_detail"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-    />
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="互动"
+        android:textColor="@android:color/black" android:textSize="30sp"/>
 
 </LinearLayout>

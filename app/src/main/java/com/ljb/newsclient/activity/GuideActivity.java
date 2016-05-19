@@ -1,10 +1,10 @@
 package com.ljb.newsclient.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 import com.ljb.newsclient.R;
 import com.ljb.newsclient.utils.DensityUtil;
 
-public class GuideActivity extends AppCompatActivity {
+public class GuideActivity extends Activity {
     private ViewPager vpGuide;   //viewpager
     private Button btnStartApp;   //开始体验按钮
     private LinearLayout llPointGroup;  //point容器

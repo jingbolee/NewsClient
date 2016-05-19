@@ -1,8 +1,8 @@
 package com.ljb.newsclient.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -13,7 +13,7 @@ import android.widget.ImageView;
 
 import com.ljb.newsclient.R;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends Activity {
     private ImageView view;
 
     @Override

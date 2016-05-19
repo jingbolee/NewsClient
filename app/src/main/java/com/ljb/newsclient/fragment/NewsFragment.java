@@ -1,9 +1,9 @@
 package com.ljb.newsclient.fragment;
 
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +16,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.ljb.newsclient.R;
 import com.ljb.newsclient.domain.NewsData;
 import com.ljb.newsclient.global.GlobalContants;
 import com.ljb.newsclient.http.HttpUtils;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.ljb.newsclient.viewpager.BaseMenuDetailPager;
+import com.ljb.newsclient.viewpager.InteractMenuDetailPager;
+import com.ljb.newsclient.viewpager.NewsMenuDetailPager;
+import com.ljb.newsclient.viewpager.PhotoMenuDetailPager;
+import com.ljb.newsclient.viewpager.TopicMenuDetailPager;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -45,8 +51,13 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
     private int mCurrentPos; //当前选择的menu
     private NewsMenuAdatper newsMenuAdatper;
 
+    public NewsData newsData;
+
     private List< NewsData.MenuData > menuDatas;
-    private ViewPager vpNewstabcontent;
+    private ViewPager vpNewsMenuDetail;
+    private List< BaseMenuDetailPager > mMenuDetailPagers;
+    private NewsMenuPagerAdapter newsMenuPagerAdapter;
+    private TextView tvTitle;
 
 
     public NewsFragment() {
@@ -54,8 +65,6 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
     }
 
     Handler mHandler = new Handler() {
-
-
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -63,7 +72,10 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
                 case CODE_SERVICE_DATA_OK:
                     newsMenuAdatper = new NewsMenuAdatper();
                     lvNewsMenu.setAdapter(newsMenuAdatper);
+                    tvTitle.setText(menuDatas.get(0).getTitle());
 
+                    newsMenuPagerAdapter = new NewsMenuPagerAdapter();
+                    vpNewsMenuDetail.setAdapter(newsMenuPagerAdapter);
                     break;
             }
 
@@ -75,7 +87,6 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         getNetWorkInfo();
-
     }
 
 
@@ -83,24 +94,28 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, null);
-        TextView tvTitle = (TextView) view.findViewById(R.id.tv_title);
-        tvTitle.setText(getFragmentTitle());
+        tvTitle = (TextView) view.findViewById(R.id.tv_title);
+
         rlMenu = (RelativeLayout) view.findViewById(R.id.rl_menu);
         slidingMenu = (SlidingMenu) view.findViewById(R.id.slidingmenu);
         lvNewsMenu = (ListView) view.findViewById(R.id.lv_news_menu);
-        vpNewstabcontent = (ViewPager) view.findViewById(R.id.vp_newsTabContent);
+        vpNewsMenuDetail = (ViewPager) view.findViewById(R.id.vp_news_menu_detail);
+
+
         return view;
     }
 
     @Override
     protected void initData() {
+
+
         lvNewsMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView< ? > parent, View view, int position, long id) {
                 slidingMenu.toggle();
-                showNewsTabContent();
+                showNewsMenuContent(position);
                 mCurrentPos = position;
-                if ( newsMenuAdatper!=null ){
+                if ( newsMenuAdatper != null ) {
                     newsMenuAdatper.notifyDataSetChanged();
                 }
             }
@@ -130,6 +145,7 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
                 mActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         Toast.makeText(mActivity, "网络请求失败：", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -151,8 +167,14 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
     //解析数据
     private void parseData(String data) {
         Gson gson = new Gson();
-        NewsData newsData = gson.fromJson(data, NewsData.class);
+        newsData = gson.fromJson(data, NewsData.class);
         menuDatas = newsData.getData();
+        List< NewsData.NewsTabData > newsTabDataList = menuDatas.get(0).getChildren();
+        mMenuDetailPagers = new ArrayList<>();
+        mMenuDetailPagers.add(new NewsMenuDetailPager(mActivity, newsTabDataList));
+        mMenuDetailPagers.add(new TopicMenuDetailPager(mActivity));
+        mMenuDetailPagers.add(new PhotoMenuDetailPager(mActivity));
+        mMenuDetailPagers.add(new InteractMenuDetailPager(mActivity));
         mHandler.sendEmptyMessage(CODE_SERVICE_DATA_OK);
 
     }
@@ -166,10 +188,23 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    private void showNewsTabContent() {
+    private void showNewsMenuContent(int position) {
+        vpNewsMenuDetail.setCurrentItem(position);
+        tvTitle.setText(menuDatas.get(position).getTitle());
+
+    }
+
+    public List< NewsData.NewsTabData > getChildrenData() {
+
+        List< NewsData.NewsTabData > children = newsData.getData().get(vpNewsMenuDetail.getCurrentItem()).getChildren();
+        if ( children.size() != 0 ) {
+            return children;
+        }
+        return null;
     }
 
 
+    //slidingmeun侧边栏listview的adapter
     class NewsMenuAdatper extends BaseAdapter {
 
         @Override
@@ -199,6 +234,33 @@ public class NewsFragment extends BaseFragment implements View.OnClickListener {
                 tvMenuName.setEnabled(false);
             }
             return view;
+        }
+    }
+
+    //slidingmenu侧边栏需要显示的viewpager的adapter
+    class NewsMenuPagerAdapter extends PagerAdapter {
+
+        //依据侧边栏中的数量决定含有多少个viewpager
+        @Override
+        public int getCount() {
+            return mMenuDetailPagers.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            BaseMenuDetailPager baseMenuDetailPager = mMenuDetailPagers.get(position);
+            container.addView(baseMenuDetailPager.mRootView);
+            return baseMenuDetailPager.mRootView;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
         }
     }
 }
