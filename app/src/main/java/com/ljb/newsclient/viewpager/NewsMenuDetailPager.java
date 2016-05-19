@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 
 import com.ljb.newsclient.R;
 import com.ljb.newsclient.domain.NewsData;
+import com.ljb.newsclient.view.ScrollTabPageIndicator;
 import com.ljb.newsclient.viewpager.tab.TabDetail;
-import com.viewpagerindicator.TabPageIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class NewsMenuDetailPager extends BaseMenuDetailPager implements ViewPage
     private static final String TAG = "NewsMenuDetailPager";
 
     private ViewPager vpNewsTop;
-    private TabPageIndicator indicatorNewsTab;
+    private ScrollTabPageIndicator indicatorNewsTab;
 
     private List< NewsData.NewsTabData > mNewsTabDataList;
     private List< TabDetail > mTabDetailList;
@@ -45,7 +45,7 @@ public class NewsMenuDetailPager extends BaseMenuDetailPager implements ViewPage
         vpNewsTop = (ViewPager) view.findViewById(R.id.vp_news_top);
 
 
-        indicatorNewsTab = (TabPageIndicator) view.findViewById(R.id.indicator_news_tab);
+        indicatorNewsTab = (ScrollTabPageIndicator) view.findViewById(R.id.indicator_news_tab);
 
 
         return view;
