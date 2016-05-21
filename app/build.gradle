@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.ljb.newsclient"
+        applicationId "com.ljb.zhbj"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
@@ -24,8 +24,8 @@ dependencies {
     compile project(':SlidingMenuLibrary')
     compile project(':ViewPagerIndicatorLibrary')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:support-v4:23.2.1'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:support-v4:23.3.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.google.code.gson:gson:2.6.2'
 }

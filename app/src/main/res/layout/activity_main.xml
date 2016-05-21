@@ -1,54 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
+    android:id="@+id/fl_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+>
 
-
-    <RadioGroup
-        android:id="@+id/rg_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/bottom_tab_bg"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/rb_home"
-            style="@style/radiobuttonstyle"
-            android:drawableTop="@drawable/selector_radio_button_home"
-            android:text="首页"/>
-
-        <RadioButton
-            android:id="@+id/rb_news"
-            style="@style/radiobuttonstyle"
-            android:drawableTop="@drawable/selector_radio_button_news"
-            android:text="新闻"/>
-
-        <RadioButton
-            android:id="@+id/rb_smart_service"
-            style="@style/radiobuttonstyle"
-            android:drawableTop="@drawable/selector_radio_button_smart"
-            android:text="智慧"/>
-
-        <RadioButton
-            android:id="@+id/rb_gov"
-            style="@style/radiobuttonstyle"
-            android:drawableTop="@drawable/selector_radio_button_gov"
-            android:text="政务"/>
-
-        <RadioButton
-            android:id="@+id/rb_setting"
-            style="@style/radiobuttonstyle"
-            android:drawableTop="@drawable/selector_radio_button_setting"
-            android:text="设置"/>
-    </RadioGroup>
-
-    <FrameLayout
-        android:id="@+id/fl_content_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/rg_group"
-        ></FrameLayout>
-</RelativeLayout>
+</FrameLayout>
