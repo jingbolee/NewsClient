@@ -22,6 +22,8 @@ public class NewsDetailPager extends BaseMenuDetailPager {
 
     @Override
     protected View initView() {
+
+
         TextView view = new TextView(mActivity);
         view.setGravity(Gravity.CENTER);
         view.setTextColor(Color.RED);

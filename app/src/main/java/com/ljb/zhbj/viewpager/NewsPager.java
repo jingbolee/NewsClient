@@ -63,7 +63,6 @@ public class NewsPager extends BasePager {
         mPagerList.add(new InteractDetailPager(mActivity));
 
         setSlidingMenuShow(true);
-        setTitleText("新闻中心");
         getServiceInfo();
 
     }
@@ -83,7 +82,7 @@ public class NewsPager extends BasePager {
                     Log.e(TAG, result);
                     parseMenuData(result);
                 } else {
-                    Log.e(TAG, "服务器返回的数据有问题");
+                    Log.e(TAG, "服务器返回的数据有问题:" + response.code() + " ," + response.isSuccessful());
                 }
             }
         });

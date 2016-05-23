@@ -59,6 +59,7 @@ public class LeftMenuFragment extends BaseFragment {
         MainActivity mainUi = (MainActivity) mActivity;
         NewsPager newsPager = mainUi.getContentFragment().getNewsPager();
         newsPager.setNewsPagerView(position);
+        newsPager.setTitleText(mMenuList.get(position).getTitle());
     }
 
 
@@ -66,7 +67,7 @@ public class LeftMenuFragment extends BaseFragment {
         mMenuList = menuList;
         adapter = new NewsLeftMenuAdapter();
         lvNewsMenu.setAdapter(adapter);
-        setNewsPagerView(0);
+        setNewsPagerView(currentPosition);
     }
 
     //slidingment左侧的listview的adapter
