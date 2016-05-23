@@ -1,9 +1,5 @@
 [
     {
-        "merged": "D:\\iWorkSpace\\github\\zhbj\\SlidingMenuLibrary\\build\\intermediates\\res\\merged\\release\\layout\\slidingmenumain.xml",
-        "source": "D:\\iWorkSpace\\github\\zhbj\\SlidingMenuLibrary\\res\\layout\\slidingmenumain.xml"
-    },
-    {
         "merged": "D:\\iWorkSpace\\github\\NewsClient\\SlidingMenuLibrary\\build\\intermediates\\res\\merged\\release\\layout\\slidingmenumain.xml",
         "source": "D:\\iWorkSpace\\github\\NewsClient\\SlidingMenuLibrary\\res\\layout\\slidingmenumain.xml"
     }

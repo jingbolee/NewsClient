@@ -19,9 +19,9 @@ public abstract class BaseMenuDetailPager {
         mRootView = initView();
     }
 
-    protected abstract View initView();
+    public abstract View initView();
 
-    private void initData() {
+    public void initData() {
     }
 
 }

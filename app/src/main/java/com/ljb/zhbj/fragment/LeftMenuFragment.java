@@ -1,5 +1,6 @@
 package com.ljb.zhbj.fragment;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -42,7 +43,7 @@ public class LeftMenuFragment extends BaseFragment {
             public void onItemClick(AdapterView< ? > parent, View view, int position, long id) {
                 currentPosition = position;
                 adapter.notifyDataSetChanged();
-                setNewsPagerView(currentPosition);
+                setNewsPagerViewFromFragment(currentPosition);
                 slidingMenuToggle();
             }
         });
@@ -55,7 +56,8 @@ public class LeftMenuFragment extends BaseFragment {
         slidingMenu.toggle();
     }
 
-    private void setNewsPagerView(int position) {
+    private void setNewsPagerViewFromFragment(int position) {
+        Log.e(TAG, "从侧滑菜单给ViewPager设置View.position:" + position);
         MainActivity mainUi = (MainActivity) mActivity;
         NewsPager newsPager = mainUi.getContentFragment().getNewsPager();
         newsPager.setNewsPagerView(position);
@@ -67,7 +69,7 @@ public class LeftMenuFragment extends BaseFragment {
         mMenuList = menuList;
         adapter = new NewsLeftMenuAdapter();
         lvNewsMenu.setAdapter(adapter);
-        setNewsPagerView(currentPosition);
+        setNewsPagerViewFromFragment(currentPosition);
     }
 
     //slidingment左侧的listview的adapter

@@ -21,7 +21,7 @@ public class InteractDetailPager extends BaseMenuDetailPager {
 
 
     @Override
-    protected View initView() {
+    public View initView() {
         TextView view = new TextView(mActivity);
         view.setGravity(Gravity.CENTER);
         view.setTextColor(Color.RED);
