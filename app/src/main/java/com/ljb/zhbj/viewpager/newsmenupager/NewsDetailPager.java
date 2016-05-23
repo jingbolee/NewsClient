@@ -5,12 +5,12 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.ljb.zhbj.R;
 import com.ljb.zhbj.domain.NewsMenuDataBean;
 import com.viewpagerindicator.TabPageIndicator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +24,8 @@ public class NewsDetailPager extends BaseMenuDetailPager {
     private TabPageIndicator indicatorNewsTab;
     private ViewPager vpNewsTop;
     private List< NewsMenuDataBean.NewsTab > mNewsMenus;
+    private List< TabInfoPager > tabInfoPagerList;
+
 
     public NewsDetailPager(Activity activity, List< NewsMenuDataBean.NewsTab > newsMenus) {
         super(activity);
@@ -34,10 +36,8 @@ public class NewsDetailPager extends BaseMenuDetailPager {
     @Override
     public View initView() {
         View view = View.inflate(mActivity, R.layout.view_news_detail_pager, null);
-
         indicatorNewsTab = (TabPageIndicator) view.findViewById(R.id.indicator_news_tab);
         vpNewsTop = (ViewPager) view.findViewById(R.id.vp_news_tab_detail);
-
         return view;
     }
 
@@ -46,6 +46,28 @@ public class NewsDetailPager extends BaseMenuDetailPager {
         NewsTabPager adapter = new NewsTabPager();
         vpNewsTop.setAdapter(adapter);
         indicatorNewsTab.setViewPager(vpNewsTop);
+        tabInfoPagerList = new ArrayList<>();
+        for ( int i = 0; i < mNewsMenus.size(); i++ ) {
+            TabInfoPager tabInfoPager = new TabInfoPager(mActivity, mNewsMenus.get(i));
+            tabInfoPagerList.add(tabInfoPager);
+        }
+
+        tabInfoPagerList.get(0).initData();
+
+        indicatorNewsTab.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                tabInfoPagerList.get(position).initData();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     class NewsTabPager extends PagerAdapter {
@@ -60,6 +82,7 @@ public class NewsDetailPager extends BaseMenuDetailPager {
             return mNewsMenus.size();
         }
 
+
         @Override
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
@@ -67,12 +90,9 @@ public class NewsDetailPager extends BaseMenuDetailPager {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            NewsMenuDataBean.NewsTab newsTab = mNewsMenus.get(position);
-            TextView view = new TextView(mActivity);
-            view.setText(newsTab.getTitle());
-
-            container.addView(view);
-            return view;
+            TabInfoPager tabInfoPager = tabInfoPagerList.get(position);
+            container.addView(tabInfoPager.mRootView);
+            return tabInfoPager.mRootView;
         }
 
         @Override

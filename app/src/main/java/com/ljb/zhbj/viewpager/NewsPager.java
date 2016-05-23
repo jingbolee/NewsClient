@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ljb.zhbj.activity.MainActivity;
@@ -32,7 +33,9 @@ import okhttp3.Response;
  */
 public class NewsPager extends BasePager {
     private static final String TAG = "NewsPager";
-    private static final int CODE_LEFT_MENU_OK = 0;
+    public static final int CODE_LEFT_MENU_OK = 0;
+    public static final int CODE_SERVICE_RESPONSE_ERROR = 1;
+    public static final int CODE_SERVICE_REQUEST_ERROR = 2;
 
     Handler mHandler = new Handler() {
         @Override
@@ -41,6 +44,14 @@ public class NewsPager extends BasePager {
             switch ( msg.what ) {
                 case CODE_LEFT_MENU_OK:
                     setSlidingMenuDataFromPager(newsMenus);
+                    break;
+
+                case CODE_SERVICE_RESPONSE_ERROR:
+                    Toast.makeText(mActivity, "服务器返回的数据有问题", Toast.LENGTH_SHORT).show();
+                    break;
+
+                case CODE_SERVICE_REQUEST_ERROR:
+                    Toast.makeText(mActivity, "服务器请求时出现了问题", Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -66,6 +77,7 @@ public class NewsPager extends BasePager {
         HttpUtils.requestHttp(GlobalContants.CATEGORIES_URL, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(CODE_SERVICE_REQUEST_ERROR);
                 Log.e(TAG, e.getMessage());
             }
 
@@ -76,6 +88,7 @@ public class NewsPager extends BasePager {
                     Log.e(TAG, result);
                     parseMenuData(result);
                 } else {
+                    mHandler.sendEmptyMessage(CODE_SERVICE_RESPONSE_ERROR);
                     Log.e(TAG, "服务器返回的数据有问题:" + response.code() + " ," + response.isSuccessful());
                 }
             }

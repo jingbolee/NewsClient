@@ -1,7 +1,5 @@
 package com.ljb.zhbj.utils;
 
-import com.ljb.zhbj.global.GlobalContants;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -41,7 +39,7 @@ public class HttpUtils {
     }
 
     private static Request setUrl(String url) {
-       return new Request.Builder().url(GlobalContants.CATEGORIES_URL).build();
+       return new Request.Builder().url(url).build();
     }
 
     public  static void requestHttp(String url, Callback callBack){
