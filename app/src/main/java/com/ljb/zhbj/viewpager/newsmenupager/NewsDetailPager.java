@@ -5,6 +5,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.ljb.zhbj.R;
 import com.ljb.zhbj.domain.NewsMenuDataBean;
@@ -25,6 +26,7 @@ public class NewsDetailPager extends BaseMenuDetailPager {
     private ViewPager vpNewsTop;
     private List< NewsMenuDataBean.NewsTab > mNewsMenus;
     private List< TabInfoPager > tabInfoPagerList;
+    private ImageButton btnGoNext;
 
 
     public NewsDetailPager(Activity activity, List< NewsMenuDataBean.NewsTab > newsMenus) {
@@ -38,6 +40,7 @@ public class NewsDetailPager extends BaseMenuDetailPager {
         View view = View.inflate(mActivity, R.layout.view_news_detail_pager, null);
         indicatorNewsTab = (TabPageIndicator) view.findViewById(R.id.indicator_news_tab);
         vpNewsTop = (ViewPager) view.findViewById(R.id.vp_news_tab_detail);
+        btnGoNext = (ImageButton) view.findViewById(R.id.btn_go_next);
         return view;
     }
 
@@ -66,6 +69,14 @@ public class NewsDetailPager extends BaseMenuDetailPager {
 
             @Override
             public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+        btnGoNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentPos = vpNewsTop.getCurrentItem();
+                indicatorNewsTab.setCurrentItem(++currentPos);
             }
         });
     }
@@ -100,4 +111,5 @@ public class NewsDetailPager extends BaseMenuDetailPager {
             container.removeView((View) object);
         }
     }
+
 }
