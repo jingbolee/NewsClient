@@ -23,6 +23,11 @@ public class NoScrollViewPager extends ViewPager {
         super(context, attrs);
     }
 
+    //事件分发
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return super.dispatchTouchEvent(ev);
+    }
 
     //事件拦截，false表示不拦截
     @Override
@@ -33,6 +38,6 @@ public class NoScrollViewPager extends ViewPager {
     //事件处理
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        return super.onTouchEvent(ev);
+        return false;
     }
 }
