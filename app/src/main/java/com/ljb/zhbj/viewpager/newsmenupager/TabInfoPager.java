@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,9 +134,7 @@ public class TabInfoPager extends BaseMenuDetailPager {
         public Object instantiateItem(ViewGroup container, int position) {
             NewsDetailInfoBean.TopNewsInfo topNewsInfo = topNewsInfoList.get(position);
             ImageView view = new ImageView(mActivity);
-            DisplayMetrics metrics = new DisplayMetrics();
-            mActivity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            int width = metrics.widthPixels;
+            int width = DensityUtil.getDevicePx(mActivity)[0];
             int heigth = DensityUtil.dip2px(mActivity, 200);
             Picasso.with(mActivity)
                     .load(topNewsInfo.topimage)

@@ -1,6 +1,8 @@
 package com.ljb.zhbj.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.util.DisplayMetrics;
 
 /**
  * @FileName: com.ljb.newsclient.utils.DensityUtil.java
@@ -25,5 +27,16 @@ public class DensityUtil {
     public static int px2dip(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
+    }
+
+    /**
+     * 获取手机的分辨率px，返回一个数组，为宽度和长度。
+     */
+    public static int[] getDevicePx(Activity activity) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int width = metrics.widthPixels;
+        int heigth = metrics.heightPixels;
+        return new int[]{width, heigth};
     }
 }
