@@ -22,6 +22,7 @@ import com.ljb.zhbj.utils.DensityUtils;
 import com.ljb.zhbj.utils.DrawableUtils;
 import com.ljb.zhbj.utils.HttpUtils;
 import com.ljb.zhbj.utils.LogUtils;
+import com.ljb.zhbj.view.TopNewsViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class TabInfoPager extends BaseMenuDetailPager {
     @Override
     public View initView() {
         View view = View.inflate(mActivity, R.layout.view_tab_info_pager, null);
-        vpTopNews = (ViewPager) view.findViewById(R.id.vp_top_news);
+        vpTopNews = (TopNewsViewPager) view.findViewById(R.id.vp_top_news);
         lvNewsInfo = (ListView) view.findViewById(R.id.lv_news_info);
         tvTopNewsTitle = (TextView) view.findViewById(R.id.tv_top_news_title);
         indicatorTopNewsCircle = (CirclePageIndicator) view.findViewById(R.id.indicator_top_news_circle);

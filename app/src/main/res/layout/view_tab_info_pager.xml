@@ -3,21 +3,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <android.support.v4.view.ViewPager
+    <com.ljb.zhbj.view.TopNewsViewPager
         android:id="@+id/vp_top_news"
         android:layout_width="match_parent"
         android:layout_height="200dp">
-    </android.support.v4.view.ViewPager>
+    </com.ljb.zhbj.view.TopNewsViewPager>
     <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_alignBottom="@id/vp_top_news"
+                  android:background="@android:color/darker_gray"
                   android:orientation="horizontal"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/vp_top_news"
-                    android:background="@android:color/darker_gray"
-                    android:padding="5dp">
+                  android:padding="5dp">
         <TextView android:id="@+id/tv_top_news_title"
                   android:layout_width="0dp"
-                  android:layout_weight="1"
                   android:layout_height="wrap_content"
+                  android:layout_weight="1"
                   android:ellipsize="end"
                   android:paddingLeft="5dp"
                   android:singleLine="true"
