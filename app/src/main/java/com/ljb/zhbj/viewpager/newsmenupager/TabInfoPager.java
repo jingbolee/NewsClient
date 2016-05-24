@@ -143,7 +143,7 @@ public class TabInfoPager extends BaseMenuDetailPager {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             NewsDetailInfoBean.TopNewsInfo topNewsInfo = topNewsInfoList.get(position);
-            ImageView view = new ImageView(mActivity);
+            ImageView image = new ImageView(mActivity);
             int width = DensityUtils.getDevicePx(mActivity)[0];
             int heigth = DensityUtils.dip2px(mActivity, 200);
 //            Picasso.with(mActivity)
@@ -153,9 +153,9 @@ public class TabInfoPager extends BaseMenuDetailPager {
 //                    .centerCrop()
 //                    .into(view);
             //使用Picasso封装以后的图片工具类
-            DrawableUtils.drawableLoader(mActivity, view, topNewsInfo.topimage, width, heigth, R.drawable.topnews_item_default);
-            container.addView(view);
-            return view;
+            DrawableUtils.drawableLoader(mActivity, image, topNewsInfo.topimage, width, heigth, R.drawable.topnews_item_default);
+            container.addView(image);
+            return image;
         }
 
         @Override
