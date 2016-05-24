@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.ljb.zhbj.R;
+import com.ljb.zhbj.activity.MainActivity;
 import com.ljb.zhbj.domain.NewsMenuDataBean;
 import com.viewpagerindicator.TabPageIndicator;
 
@@ -64,6 +66,13 @@ public class NewsDetailPager extends BaseMenuDetailPager {
 
             @Override
             public void onPageSelected(int position) {
+                MainActivity mainUi = (MainActivity) mActivity;
+                SlidingMenu slidingMenu = mainUi.getSlidingMenu();
+                if ( vpNewsTop.getCurrentItem() == 0 ) {
+                    slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+                } else {
+                    slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+                }
                 tabInfoPagerList.get(position).initData();
             }
 
