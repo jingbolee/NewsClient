@@ -1,9 +1,12 @@
 package com.ljb.zhbj.utils;
 
+import java.io.IOException;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @FileName: com.ljb.newsclient.http.HttpUtils.java
@@ -34,17 +37,26 @@ public class HttpUtils {
     private static final String TAG = "HttpUtils";
 
     private static final OkHttpClient mOkHttpClient = new OkHttpClient();
+
     static {
 
     }
 
     private static Request setUrl(String url) {
-       return new Request.Builder().url(url).build();
+        return new Request.Builder().url(url).build();
     }
 
-    public  static void requestHttp(String url, Callback callBack){
+    public static void requestHttp(String url, Callback callback) {
         Call call = mOkHttpClient.newCall(setUrl(url));
-        call.enqueue(callBack);
+        call.enqueue(callback);
+    }
+
+    private HttpCallBack httpCallBack;
+
+    public interface HttpCallBack {
+        void onResponse(Call call, Response response) throws IOException;
+
+        void onFailure(Call call, IOException e);
     }
 
 

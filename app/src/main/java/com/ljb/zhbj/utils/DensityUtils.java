@@ -5,13 +5,13 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 
 /**
- * @FileName: com.ljb.newsclient.utils.DensityUtil.java
+ * @FileName: com.ljb.newsclient.utils.DensityUtils.java
  * @Author: Li Jingbo
  * @Date: 2016-05-12 16:29
  * @Version V1.0 <描述当前版本功能>
  */
-public class DensityUtil {
-    private static final String TAG = "DensityUtil";
+public class DensityUtils {
+    private static final String TAG = "DensityUtils";
 
     /**
      * 根据手机的分辨率从 dip 的单位 转成为 px(像素)

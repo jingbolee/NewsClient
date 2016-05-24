@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.ljb.zhbj.R;
-import com.ljb.zhbj.utils.DensityUtil;
+import com.ljb.zhbj.utils.DensityUtils;
 
 public class GuideActivity extends Activity {
     private ViewPager vpGuide;   //viewpager
@@ -66,10 +66,10 @@ public class GuideActivity extends Activity {
         for ( int i = 0; i < mImages.length; i++ ) {
             View view = new View(GuideActivity.this);
             view.setBackgroundResource(R.drawable.point_unfouce);
-            int pointPx = DensityUtil.dip2px(GuideActivity.this, 8);
+            int pointPx = DensityUtils.dip2px(GuideActivity.this, 8);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(pointPx, pointPx);
             if ( i > 0 ) {
-                params.leftMargin = DensityUtil.dip2px(GuideActivity.this, 6);
+                params.leftMargin = DensityUtils.dip2px(GuideActivity.this, 6);
             }
             view.setLayoutParams(params);
             llPointGroup.addView(view);

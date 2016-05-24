@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -17,9 +18,11 @@ import com.ljb.zhbj.R;
 import com.ljb.zhbj.domain.NewsDetailInfoBean;
 import com.ljb.zhbj.domain.NewsMenuDataBean;
 import com.ljb.zhbj.global.GlobalContants;
-import com.ljb.zhbj.utils.DensityUtil;
+import com.ljb.zhbj.utils.DensityUtils;
+import com.ljb.zhbj.utils.DrawableUtils;
 import com.ljb.zhbj.utils.HttpUtils;
-import com.squareup.picasso.Picasso;
+import com.ljb.zhbj.utils.LogUtils;
+import com.viewpagerindicator.CirclePageIndicator;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,6 +49,8 @@ public class TabInfoPager extends BaseMenuDetailPager {
     private NewsDetailInfoBean newsDetailInfoBean;
     private List< NewsDetailInfoBean.NewsInfo > newsInfoList;
     private List< NewsDetailInfoBean.TopNewsInfo > topNewsInfoList;
+    private CirclePageIndicator indicatorTopNewsCircle;
+    private TextView tvTopNewsTitle;
 
     public TabInfoPager(Activity activity, NewsMenuDataBean.NewsTab newsTab) {
         super(activity);
@@ -63,6 +68,7 @@ public class TabInfoPager extends BaseMenuDetailPager {
                 case CODE_DATAS_OK:
                     mTopNewsAdapter = new TopNewsAdapter();
                     vpTopNews.setAdapter(mTopNewsAdapter);
+                    indicatorTopNewsCircle.setViewPager(vpTopNews);
                     break;
                 case CODE_SERVICE_RESPONSE_ERROR:
                     Toast.makeText(mActivity, "服务器返回的数据有问题", Toast.LENGTH_SHORT).show();
@@ -80,7 +86,10 @@ public class TabInfoPager extends BaseMenuDetailPager {
         View view = View.inflate(mActivity, R.layout.view_tab_info_pager, null);
         vpTopNews = (ViewPager) view.findViewById(R.id.vp_top_news);
         lvNewsInfo = (ListView) view.findViewById(R.id.lv_news_info);
+        tvTopNewsTitle = (TextView) view.findViewById(R.id.tv_top_news_title);
+        indicatorTopNewsCircle = (CirclePageIndicator) view.findViewById(R.id.indicator_top_news_circle);
         return view;
+
     }
 
     @Override
@@ -100,7 +109,8 @@ public class TabInfoPager extends BaseMenuDetailPager {
             public void onResponse(Call call, Response response) throws IOException {
                 if ( response.isSuccessful() && response.code() == 200 ) {
                     String result = response.body().string();
-                    Log.e(TAG, result);
+//                    Log.e(TAG, result);
+                    LogUtils.e(result);
                     parseNewsInfoData(result);
                 } else {
                     Log.e(TAG, "...." + response.code());
@@ -134,14 +144,16 @@ public class TabInfoPager extends BaseMenuDetailPager {
         public Object instantiateItem(ViewGroup container, int position) {
             NewsDetailInfoBean.TopNewsInfo topNewsInfo = topNewsInfoList.get(position);
             ImageView view = new ImageView(mActivity);
-            int width = DensityUtil.getDevicePx(mActivity)[0];
-            int heigth = DensityUtil.dip2px(mActivity, 200);
-            Picasso.with(mActivity)
-                    .load(topNewsInfo.topimage)
-                    .placeholder(R.drawable.topnews_item_default)
-                    .resize(width, heigth)
-                    .centerCrop()
-                    .into(view);
+            int width = DensityUtils.getDevicePx(mActivity)[0];
+            int heigth = DensityUtils.dip2px(mActivity, 200);
+//            Picasso.with(mActivity)
+//                    .load(topNewsInfo.topimage)
+//                    .placeholder(R.drawable.topnews_item_default)
+//                    .resize(width, heigth)
+//                    .centerCrop()
+//                    .into(view);
+            //使用Picasso封装以后的图片工具类
+            DrawableUtils.drawableLoader(mActivity, view, topNewsInfo.topimage, width, heigth, R.drawable.topnews_item_default);
             container.addView(view);
             return view;
         }
