@@ -106,20 +106,17 @@ public class NewsPager extends BasePager {
         mPagerList.add(new TopicDetailPager(mActivity));
         mPagerList.add(new PhotoDetailPager(mActivity));
         mPagerList.add(new InteractDetailPager(mActivity));
-        Log.e(TAG, "mPagerList生成了：" + mPagerList.size());
         mHandler.sendEmptyMessage(CODE_LEFT_MENU_OK);
     }
 
     //给slidingmenu侧滑菜单设置数据
     private void setSlidingMenuDataFromPager(List< NewsMenuDataBean.NewsMenu > newsMenus) {
-        Log.e(TAG, "给slidingmenu侧滑菜单设置数据,从NewsPager,这个时候mPagerList的长度为");
         MainActivity mainUi = (MainActivity) mActivity;
         mainUi.getLeftMenuFragment().setSlidingMenuList(newsMenus);
     }
 
 
     public void setNewsPagerView(int position) {
-        Log.e(TAG, "要给FrameLayout设置长度了" + ",位置为:" + position + "，mPagerList的长度为：" + mPagerList.size());
         setFrameLayoutView(mPagerList.get(position).mRootView);
         mPagerList.get(position).initData();
 

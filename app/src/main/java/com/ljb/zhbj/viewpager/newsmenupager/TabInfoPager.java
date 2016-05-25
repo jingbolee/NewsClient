@@ -36,9 +36,9 @@ import okhttp3.Response;
  * @FileName: com.ljb.zhbj.viewpager.newsmenupager.TabInfoPager.java
  * @Author: Li Jingbo
  * @Date: 2016-05-23 15:19
- * @Version V1.0 <描述当前版本功能>
+ * @Version V1.0 TabInfoPager
  */
-public class TabInfoPager extends BaseMenuDetailPager {
+public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPageChangeListener {
     private static final String TAG = "TabInfoPager";
     public static final int CODE_DATAS_OK = 0;
     public static final int CODE_SERVICE_RESPONSE_ERROR = 1;
@@ -55,7 +55,7 @@ public class TabInfoPager extends BaseMenuDetailPager {
 
     public TabInfoPager(Activity activity, NewsMenuDataBean.NewsTab newsTab) {
         super(activity);
-        mUrl = GlobalContants.HTTP_URL + newsTab.getUrl();
+        mUrl = GlobalContants.SERVICE_HTTP + newsTab.getUrl();
         Log.e(TAG, "URL:" + mUrl);
     }
 
@@ -70,6 +70,8 @@ public class TabInfoPager extends BaseMenuDetailPager {
                     mTopNewsAdapter = new TopNewsAdapter();
                     vpTopNews.setAdapter(mTopNewsAdapter);
                     indicatorTopNewsCircle.setViewPager(vpTopNews);
+                    tvTopNewsTitle.setText(topNewsInfoList.get(0).title);
+                    indicatorTopNewsCircle.setOnPageChangeListener(TabInfoPager.this);
                     break;
                 case CODE_SERVICE_RESPONSE_ERROR:
                     Toast.makeText(mActivity, "服务器返回的数据有问题", Toast.LENGTH_SHORT).show();
@@ -127,6 +129,21 @@ public class TabInfoPager extends BaseMenuDetailPager {
         newsInfoList = newsDetailInfoBean.data.news;
         topNewsInfoList = newsDetailInfoBean.data.topnews;
         mHandler.sendEmptyMessage(CODE_DATAS_OK);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        tvTopNewsTitle.setText(topNewsInfoList.get(position).title);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 
     class TopNewsAdapter extends PagerAdapter {
