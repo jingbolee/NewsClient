@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -48,10 +49,12 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     private ListView lvNewsInfo;
     private TopNewsAdapter mTopNewsAdapter;
     private NewsDetailInfoBean newsDetailInfoBean;
-    private List< NewsDetailInfoBean.NewsInfo > newsInfoList;
-    private List< NewsDetailInfoBean.TopNewsInfo > topNewsInfoList;
+    private List< NewsDetailInfoBean.NewsInfo > mNewsInfoList; //listview用的数据
+    private List< NewsDetailInfoBean.TopNewsInfo > mTopNewsInfoList; //头条新闻用的数据
     private CirclePageIndicator indicatorTopNewsCircle;
     private TextView tvTopNewsTitle;
+
+    private NewsDetailAdapter mNewsDetailAdapter;
 
     public TabInfoPager(Activity activity, NewsMenuDataBean.NewsTab newsTab) {
         super(activity);
@@ -60,8 +63,6 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     }
 
     Handler mHandler = new Handler() {
-
-
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -70,8 +71,11 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                     mTopNewsAdapter = new TopNewsAdapter();
                     vpTopNews.setAdapter(mTopNewsAdapter);
                     indicatorTopNewsCircle.setViewPager(vpTopNews);
-                    tvTopNewsTitle.setText(topNewsInfoList.get(0).title);
+                    tvTopNewsTitle.setText(mTopNewsInfoList.get(0).title);
                     indicatorTopNewsCircle.setOnPageChangeListener(TabInfoPager.this);
+
+                    mNewsDetailAdapter = new NewsDetailAdapter();
+                    lvNewsInfo.setAdapter(mNewsDetailAdapter);
                     break;
                 case CODE_SERVICE_RESPONSE_ERROR:
                     Toast.makeText(mActivity, "服务器返回的数据有问题", Toast.LENGTH_SHORT).show();
@@ -87,10 +91,14 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     @Override
     public View initView() {
         View view = View.inflate(mActivity, R.layout.view_tab_info_pager, null);
-        vpTopNews = (TopNewsViewPager) view.findViewById(R.id.vp_top_news);
+        View headerView = View.inflate(mActivity, R.layout.view_header_topnews, null);
+        vpTopNews = (TopNewsViewPager) headerView.findViewById(R.id.vp_top_news);
+
+        tvTopNewsTitle = (TextView) headerView.findViewById(R.id.tv_top_news_title);
+        indicatorTopNewsCircle = (CirclePageIndicator) headerView.findViewById(R.id.indicator_top_news_circle);
         lvNewsInfo = (ListView) view.findViewById(R.id.lv_news_info);
-        tvTopNewsTitle = (TextView) view.findViewById(R.id.tv_top_news_title);
-        indicatorTopNewsCircle = (CirclePageIndicator) view.findViewById(R.id.indicator_top_news_circle);
+
+        lvNewsInfo.addHeaderView(headerView);
         return view;
 
     }
@@ -98,9 +106,9 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     @Override
     public void initData() {
         getNewsInfoFromService(mUrl);
-
     }
 
+    //从服务器获取数据
     private void getNewsInfoFromService(String url) {
         HttpUtils.requestHttp(url, new Callback() {
             @Override
@@ -123,11 +131,12 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         });
     }
 
+    //解析从服务器获取到的数据
     private void parseNewsInfoData(String result) {
         Gson gson = new Gson();
         newsDetailInfoBean = gson.fromJson(result, NewsDetailInfoBean.class);
-        newsInfoList = newsDetailInfoBean.data.news;
-        topNewsInfoList = newsDetailInfoBean.data.topnews;
+        mNewsInfoList = newsDetailInfoBean.data.news;
+        mTopNewsInfoList = newsDetailInfoBean.data.topnews;
         mHandler.sendEmptyMessage(CODE_DATAS_OK);
     }
 
@@ -138,7 +147,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
     @Override
     public void onPageSelected(int position) {
-        tvTopNewsTitle.setText(topNewsInfoList.get(position).title);
+        tvTopNewsTitle.setText(mTopNewsInfoList.get(position).title);
     }
 
     @Override
@@ -150,7 +159,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
         @Override
         public int getCount() {
-            return topNewsInfoList.size();
+            return mTopNewsInfoList.size();
         }
 
         @Override
@@ -160,7 +169,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            NewsDetailInfoBean.TopNewsInfo topNewsInfo = topNewsInfoList.get(position);
+            NewsDetailInfoBean.TopNewsInfo topNewsInfo = mTopNewsInfoList.get(position);
             ImageView image = new ImageView(mActivity);
             int width = DensityUtils.getDevicePx(mActivity)[0];
             int heigth = DensityUtils.dip2px(mActivity, 200);
@@ -180,5 +189,51 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
         }
+    }
+
+    //listview的adapter
+    class NewsDetailAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return mNewsInfoList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mNewsInfoList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            NewsDetailInfoBean.NewsInfo newsInfo = mNewsInfoList.get(position);
+            ViewHolder holder;
+            if ( convertView == null ) {
+                convertView = View.inflate(mActivity, R.layout.item_listview_news_detail, null);
+                holder = new ViewHolder();
+                holder.tvNewsTitle = (TextView) convertView.findViewById(R.id.tv_news_title);
+                holder.tvNewsData = (TextView) convertView.findViewById(R.id.tv_news_data);
+                holder.ivNewsImage = (ImageView) convertView.findViewById(R.id.iv_news_image);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            holder.tvNewsTitle.setText(newsInfo.title);
+            holder.tvNewsData.setText(newsInfo.pubdate);
+            int width = DensityUtils.dip2px(mActivity, 120);
+            int heigth = DensityUtils.dip2px(mActivity, 70);
+            DrawableUtils.drawableLoader(mActivity, holder.ivNewsImage, newsInfo.listimage, width, heigth, R.drawable.pic_item_list_default);
+            return convertView;
+        }
+    }
+
+    static class ViewHolder {
+        public TextView tvNewsTitle;
+        public TextView tvNewsData;
+        public ImageView ivNewsImage;
     }
 }

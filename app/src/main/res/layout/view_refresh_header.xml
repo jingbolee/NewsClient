@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp">
+
+    <ImageView
+        android:id="@+id/iv_refresh_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/common_listview_headview_red_arrow"/>
+
+    <TextView
+        android:id="@+id/tv_refresh_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/iv_refresh_arrow"
+        android:layout_centerHorizontal="true"
+        android:text="下拉刷新"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="18sp"
+    />
+
+    <TextView
+        android:id="@+id/tv_refresh_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_refresh_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:text="2014-10-11 13:18:10"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="14sp"/>
+</RelativeLayout>

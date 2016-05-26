@@ -11,7 +11,8 @@ public class GlobalContants {
 
 
     //服务器地址
-    public static final String SERVICE_HTTP = "http://192.168.100.100:8080/zhbj";
+    public static final String SERVICE_HTTP = "http://zhihuibj.sinaapp.com/zhbj";
+//    http://zhihuibj.sinaapp.com/zhbj
     //categoried地址
     public static final String CATEGORIES_URL = SERVICE_HTTP + "/categories.json";
 
