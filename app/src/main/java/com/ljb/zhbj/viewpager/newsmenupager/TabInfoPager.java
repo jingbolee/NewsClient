@@ -52,6 +52,8 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     public static final int CODE_SERVICE_RESPONSE_ERROR = 1;
     public static final int CODE_SERVICE_REQUEST_ERROR = 2;
     private static final int CODE_NO_MORE_URL = 4;
+    private static final int CODE_LOOP = 5;
+
     private String mUrl;
     private ViewPager vpTopNews;
     private RefreshListView lvNewsInfo;
@@ -80,6 +82,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                     if ( mTopNewsAdapter == null ) {
                         mTopNewsAdapter = new TopNewsAdapter();
                         vpTopNews.setAdapter(mTopNewsAdapter);
+                        mHandler.sendEmptyMessageDelayed(CODE_LOOP, 3000);
                     } else {
                         mTopNewsAdapter.notifyDataSetChanged();
                     }
@@ -108,6 +111,19 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                 case CODE_NO_MORE_URL:
                     Toast.makeText(mActivity, "已到最后一页了...", Toast.LENGTH_SHORT).show();
                     lvNewsInfo.refreshComplete(true);
+                    break;
+
+                //viewpager循环播放
+                case CODE_LOOP:
+                    int currentItem = vpTopNews.getCurrentItem();
+                    Log.e(TAG, "当前位置：" + currentItem);
+                    if ( currentItem < mTopNewsInfoList.size() - 1 ) {
+                        currentItem++;
+                    } else {
+                        currentItem = 0;
+                    }
+                    vpTopNews.setCurrentItem(currentItem);
+                    mHandler.sendEmptyMessageDelayed(CODE_LOOP, 3000);
                     break;
             }
         }
@@ -156,6 +172,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                 mActivity.startActivity(intent);
             }
         });
+
         return view;
     }
 
@@ -261,7 +278,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            NewsDetailInfoBean.TopNewsInfo topNewsInfo = mTopNewsInfoList.get(position);
+            final NewsDetailInfoBean.TopNewsInfo topNewsInfo = mTopNewsInfoList.get(position);
             ImageView image = new ImageView(mActivity);
             int width = DensityUtils.getDevicePx(mActivity)[0];
             int heigth = DensityUtils.dip2px(mActivity, 200);
@@ -274,6 +291,16 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
             //使用Picasso封装以后的图片工具类
             DrawableUtils.drawableLoader(mActivity, image, topNewsInfo.topimage, width, heigth, R.drawable.topnews_item_default);
             container.addView(image);
+
+            //头条新闻的图片设置点击事件
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mActivity, NewsDetailActivity.class);
+                    intent.putExtra("url", topNewsInfo.url);
+                    mActivity.startActivity(intent);
+                }
+            });
             return image;
         }
 
@@ -340,4 +367,5 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         public TextView tvNewsData;
         public ImageView ivNewsImage;
     }
+
 }
