@@ -3,13 +3,10 @@ package com.ljb.zhbj.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
@@ -45,28 +42,7 @@ public class NewsDetailActivity extends Activity implements View.OnClickListener
         mWebViewSettings.setBuiltInZoomControls(true);//支持放大和缩小
         mWebViewSettings.setDisplayZoomControls(true);
         mWebViewSettings.setUseWideViewPort(true);  //支持双击缩放
-
-        mWebView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Log.e(TAG, "Url地址为：" + url);
-                view.loadUrl(url);
-                return true;
-            }
-
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                Log.e(TAG, "页面开始加载：" + url);
-                super.onPageStarted(view, url, favicon);
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                Log.e(TAG, "页面结束加载：" + url);
-                super.onPageFinished(view, url);
-            }
-        });
-        mWebView.loadUrl("http://www.baidu.com");//webview加载url
+        mWebView.loadUrl(url);//webview加载url
     }
 
     @Override
@@ -77,24 +53,26 @@ public class NewsDetailActivity extends Activity implements View.OnClickListener
                 break;
 
             case R.id.btn_share:
-                goToShare();
+                showShare();
                 break;
 
             case R.id.btn_text_size:
-                setWebViewTextSize();
+                showTextSize();
                 break;
         }
     }
 
     //分享，通过ShareSDK
-    private void goToShare() {
-        
+    private void showShare() {
+
+        //需要填写ShareSDK分享的代码
     }
 
     private int mCurrentItem = 2; //默认选中正常字体,这个变量是保存的用户确定后的选择
     private int mCurrentSiteItem; //这个是用户没有点击确定的选择，要把这个变量传递到webview的setting中
 
-    private void setWebViewTextSize() {
+    //设置webview的字体大小
+    private void showTextSize() {
         String[] items = new String[]{"超大号字体", "大号字体", "正常字体", "小号字体", "超小号字体"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("设置字体大小");

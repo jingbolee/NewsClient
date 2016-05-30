@@ -12,6 +12,7 @@ import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 
 import com.ljb.zhbj.R;
+import com.ljb.zhbj.utils.PreferenUtils;
 
 public class SplashActivity extends Activity {
     private ImageView view;
@@ -69,7 +70,8 @@ public class SplashActivity extends Activity {
     }
 
     private void goToNextActivity() {
-        boolean isUserFirst = getSharedPreferences("config", MODE_PRIVATE).getBoolean("is_user_first", true);
+        //判断是否第一次运行
+        boolean isUserFirst = PreferenUtils.getBoolean(SplashActivity.this, "is_user_first", true);
         if ( isUserFirst ) {
             startActivity(new Intent(SplashActivity.this, GuideActivity.class));
         } else {

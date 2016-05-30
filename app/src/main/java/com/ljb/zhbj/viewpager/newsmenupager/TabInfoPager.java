@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +22,10 @@ import com.ljb.zhbj.activity.NewsDetailActivity;
 import com.ljb.zhbj.domain.NewsDetailInfoBean;
 import com.ljb.zhbj.domain.NewsMenuDataBean;
 import com.ljb.zhbj.global.GlobalContants;
+import com.ljb.zhbj.utils.CacheUtils;
 import com.ljb.zhbj.utils.DensityUtils;
 import com.ljb.zhbj.utils.DrawableUtils;
 import com.ljb.zhbj.utils.HttpUtils;
-import com.ljb.zhbj.utils.LogUtils;
 import com.ljb.zhbj.view.RefreshListView;
 import com.ljb.zhbj.view.TopNewsViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -133,7 +134,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
 
                 Intent intent = new Intent(mActivity, NewsDetailActivity.class);
-                intent.putExtra("url",url);
+                intent.putExtra("url", url);
                 mActivity.startActivity(intent);
             }
         });
@@ -143,11 +144,15 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
     @Override
     public void initData() {
+        String cache = CacheUtils.getCache(mActivity, mUrl);
+        if ( !TextUtils.isEmpty(cache) ) {
+            parseNewsInfoData(cache);
+        }
         getNewsInfoFromService(mUrl);
     }
 
     //从服务器获取数据
-    private void getNewsInfoFromService(String url) {
+    private void getNewsInfoFromService(final String url) {
         HttpUtils.requestHttp(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -159,9 +164,8 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
             public void onResponse(Call call, Response response) throws IOException {
                 if ( response.isSuccessful() && response.code() == 200 ) {
                     String result = response.body().string();
-//                    Log.e(TAG, result);
-                    LogUtils.e(result);
                     parseNewsInfoData(result);
+                    CacheUtils.putCache(mActivity, url, result);
                 } else {
                     Log.e(TAG, "...." + response.code());
                     mHandler.sendEmptyMessage(CODE_SERVICE_RESPONSE_ERROR);
@@ -284,9 +288,11 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
             }
             holder.tvNewsTitle.setText(newsInfo.title);
             holder.tvNewsData.setText(newsInfo.pubdate);
-            int width = DensityUtils.dip2px(mActivity, 120);
-            int heigth = DensityUtils.dip2px(mActivity, 70);
-            DrawableUtils.drawableLoader(mActivity, holder.ivNewsImage, newsInfo.listimage, width, heigth, R.drawable.pic_item_list_default);
+            //主动让系统去测量holder.ivNewsImage的宽和高
+            holder.ivNewsImage.measure(0, 0);
+            int measuredWidth = holder.ivNewsImage.getMeasuredWidth();
+            int measuredHeight = holder.ivNewsImage.getMeasuredHeight();
+            DrawableUtils.drawableLoader(mActivity, holder.ivNewsImage, newsInfo.listimage, measuredWidth, measuredHeight, R.drawable.pic_item_list_default);
             return convertView;
         }
     }

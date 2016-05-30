@@ -3,6 +3,7 @@ package com.ljb.zhbj.viewpager;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,6 +11,7 @@ import com.google.gson.Gson;
 import com.ljb.zhbj.activity.MainActivity;
 import com.ljb.zhbj.domain.NewsMenuDataBean;
 import com.ljb.zhbj.global.GlobalContants;
+import com.ljb.zhbj.utils.CacheUtils;
 import com.ljb.zhbj.utils.HttpUtils;
 import com.ljb.zhbj.viewpager.newsmenupager.BaseMenuDetailPager;
 import com.ljb.zhbj.viewpager.newsmenupager.InteractDetailPager;
@@ -68,6 +70,10 @@ public class NewsPager extends BasePager {
     public void initData() {
         super.initData();
         setSlidingMenuShow(true);
+        String cache = CacheUtils.getCache(mActivity, GlobalContants.CATEGORIES_URL);
+        if ( !TextUtils.isEmpty(cache) ) {
+            parseMenuData(cache);
+        }
         getServiceInfo();
 
     }
@@ -87,6 +93,7 @@ public class NewsPager extends BasePager {
                     String result = response.body().string();
                     Log.e(TAG, result);
                     parseMenuData(result);
+                    CacheUtils.putCache(mActivity, GlobalContants.CATEGORIES_URL, result);
                 } else {
                     mHandler.sendEmptyMessage(CODE_SERVICE_RESPONSE_ERROR);
                     Log.e(TAG, "服务器返回的数据有问题:" + response.code() + " ," + response.isSuccessful());

@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 
 import com.ljb.zhbj.R;
 import com.ljb.zhbj.utils.DensityUtils;
+import com.ljb.zhbj.utils.PreferenUtils;
 
 public class GuideActivity extends Activity {
     private ViewPager vpGuide;   //viewpager
@@ -53,7 +54,8 @@ public class GuideActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(GuideActivity.this, MainActivity.class));
-                getSharedPreferences("config", MODE_PRIVATE).edit().putBoolean("is_user_first", false).commit();
+//                getSharedPreferences("config", MODE_PRIVATE).edit().putBoolean("is_user_first", false).commit();
+                PreferenUtils.putBoolean(GuideActivity.this, "is_user_first", false);
                 finish();
             }
         });
