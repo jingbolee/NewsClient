@@ -3,6 +3,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp">
+    <ProgressBar
+        android:id="@+id/pb_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:indeterminateDrawable="@drawable/custom_progress"
+        android:visibility="invisible"/>
 
     <ImageView
         android:id="@+id/iv_refresh_arrow"
@@ -32,8 +42,9 @@
         android:layout_below="@id/tv_refresh_title"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
-        android:text="2014-10-11 13:18:10"
+        android:text="尚未更新"
         android:textColor="@android:color/darker_gray"
         android:textSize="14sp"/>
 </RelativeLayout>

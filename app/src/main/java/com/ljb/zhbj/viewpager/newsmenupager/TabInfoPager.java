@@ -1,6 +1,7 @@
 package com.ljb.zhbj.viewpager.newsmenupager;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
@@ -8,14 +9,15 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ljb.zhbj.R;
+import com.ljb.zhbj.activity.NewsDetailActivity;
 import com.ljb.zhbj.domain.NewsDetailInfoBean;
 import com.ljb.zhbj.domain.NewsMenuDataBean;
 import com.ljb.zhbj.global.GlobalContants;
@@ -23,6 +25,7 @@ import com.ljb.zhbj.utils.DensityUtils;
 import com.ljb.zhbj.utils.DrawableUtils;
 import com.ljb.zhbj.utils.HttpUtils;
 import com.ljb.zhbj.utils.LogUtils;
+import com.ljb.zhbj.view.RefreshListView;
 import com.ljb.zhbj.view.TopNewsViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -44,9 +47,11 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     public static final int CODE_DATAS_OK = 0;
     public static final int CODE_SERVICE_RESPONSE_ERROR = 1;
     public static final int CODE_SERVICE_REQUEST_ERROR = 2;
+    private static final int CODE_REFRESH_OK = 4;
+    private static final int CODE_LODERMORE_OK = 5;
     private String mUrl;
     private ViewPager vpTopNews;
-    private ListView lvNewsInfo;
+    private RefreshListView lvNewsInfo;
     private TopNewsAdapter mTopNewsAdapter;
     private NewsDetailInfoBean newsDetailInfoBean;
     private List< NewsDetailInfoBean.NewsInfo > mNewsInfoList; //listview用的数据
@@ -55,6 +60,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     private TextView tvTopNewsTitle;
 
     private NewsDetailAdapter mNewsDetailAdapter;
+    private String mMoreUrl;
 
     public TabInfoPager(Activity activity, NewsMenuDataBean.NewsTab newsTab) {
         super(activity);
@@ -84,6 +90,14 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                 case CODE_SERVICE_REQUEST_ERROR:
                     Toast.makeText(mActivity, "服务器请求时出现了问题", Toast.LENGTH_SHORT).show();
                     break;
+
+                case CODE_REFRESH_OK:
+                    lvNewsInfo.refreshComplete(false);
+                    break;
+
+                case CODE_LODERMORE_OK:
+                    lvNewsInfo.refreshComplete(true);
+                    break;
             }
         }
     };
@@ -96,9 +110,33 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
         tvTopNewsTitle = (TextView) headerView.findViewById(R.id.tv_top_news_title);
         indicatorTopNewsCircle = (CirclePageIndicator) headerView.findViewById(R.id.indicator_top_news_circle);
-        lvNewsInfo = (ListView) view.findViewById(R.id.lv_news_info);
+        lvNewsInfo = (RefreshListView) view.findViewById(R.id.lv_news_info);
 
         lvNewsInfo.addHeaderView(headerView);
+
+        lvNewsInfo.setRefreshListener(new RefreshListView.RefreshListener() {
+            @Override
+            public void onRefresh() {
+                getNewsInfoFromService(mUrl);
+            }
+
+            @Override
+            public void onLoadMore() {
+                getNewsDataMoreFromService(mMoreUrl);
+            }
+        });
+
+        lvNewsInfo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView< ? > parent, View view, int position, long id) {
+                String url = mNewsInfoList.get(position).url;
+
+
+                Intent intent = new Intent(mActivity, NewsDetailActivity.class);
+                intent.putExtra("url",url);
+                mActivity.startActivity(intent);
+            }
+        });
         return view;
 
     }
@@ -114,6 +152,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
             @Override
             public void onFailure(Call call, IOException e) {
                 mHandler.sendEmptyMessage(CODE_SERVICE_REQUEST_ERROR);
+
             }
 
             @Override
@@ -131,12 +170,33 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         });
     }
 
+    private void getNewsDataMoreFromService(String moreUrl) {
+        HttpUtils.requestHttp(moreUrl, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(CODE_SERVICE_REQUEST_ERROR);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if ( response.isSuccessful() && response.code() == 200 ) {
+                    String result = response.body().string();
+
+                }
+            }
+        });
+    }
+
     //解析从服务器获取到的数据
     private void parseNewsInfoData(String result) {
         Gson gson = new Gson();
         newsDetailInfoBean = gson.fromJson(result, NewsDetailInfoBean.class);
         mNewsInfoList = newsDetailInfoBean.data.news;
+        String more = newsDetailInfoBean.data.more;
+        if ( more != null )
+            mMoreUrl = GlobalContants.SERVICE_HTTP + more;
         mTopNewsInfoList = newsDetailInfoBean.data.topnews;
+
         mHandler.sendEmptyMessage(CODE_DATAS_OK);
     }
 
@@ -231,6 +291,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         }
     }
 
+    //listview的ViewHolder
     static class ViewHolder {
         public TextView tvNewsTitle;
         public TextView tvNewsData;
