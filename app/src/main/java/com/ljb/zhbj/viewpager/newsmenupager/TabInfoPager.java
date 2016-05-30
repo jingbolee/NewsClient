@@ -53,6 +53,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     public static final int CODE_SERVICE_REQUEST_ERROR = 2;
     private static final int CODE_REFRESH_OK = 4;
     private static final int CODE_LODERMORE_OK = 5;
+    private static final int CODE_NO_MORE_URL = 6;
     private String mUrl;
     private ViewPager vpTopNews;
     private RefreshListView lvNewsInfo;
@@ -78,28 +79,36 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
             super.handleMessage(msg);
             switch ( msg.what ) {
                 case CODE_DATAS_OK:
-                    mTopNewsAdapter = new TopNewsAdapter();
-                    vpTopNews.setAdapter(mTopNewsAdapter);
-                    indicatorTopNewsCircle.setViewPager(vpTopNews);
+                    if ( mTopNewsAdapter == null ) {
+                        mTopNewsAdapter = new TopNewsAdapter();
+                        vpTopNews.setAdapter(mTopNewsAdapter);
+                    } else {
+                        mTopNewsAdapter.notifyDataSetChanged();
+                    }
                     tvTopNewsTitle.setText(mTopNewsInfoList.get(0).title);
+                    indicatorTopNewsCircle.setViewPager(vpTopNews);
                     indicatorTopNewsCircle.setOnPageChangeListener(TabInfoPager.this);
+                    if ( mNewsDetailAdapter == null ) {
+                        mNewsDetailAdapter = new NewsDetailAdapter();
+                        lvNewsInfo.setAdapter(mNewsDetailAdapter);
+                    } else {
+                        mNewsDetailAdapter.notifyDataSetChanged();
+                        lvNewsInfo.refreshComplete(true);
+                    }
 
-                    mNewsDetailAdapter = new NewsDetailAdapter();
-                    lvNewsInfo.setAdapter(mNewsDetailAdapter);
                     break;
                 case CODE_SERVICE_RESPONSE_ERROR:
                     Toast.makeText(mActivity, "服务器返回的数据有问题", Toast.LENGTH_SHORT).show();
+                    lvNewsInfo.refreshComplete(true);
                     break;
 
                 case CODE_SERVICE_REQUEST_ERROR:
-                    Toast.makeText(mActivity, "服务器请求时出现了问题", Toast.LENGTH_SHORT).show();
-                    break;
-
-                case CODE_REFRESH_OK:
+                    Toast.makeText(mActivity, "请检查网络，是否可以上网", Toast.LENGTH_SHORT).show();
                     lvNewsInfo.refreshComplete(false);
                     break;
 
-                case CODE_LODERMORE_OK:
+                case CODE_NO_MORE_URL:
+                    Toast.makeText(mActivity, "已到最后一页了...", Toast.LENGTH_SHORT).show();
                     lvNewsInfo.refreshComplete(true);
                     break;
             }
@@ -118,7 +127,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
         lvNewsInfo.addHeaderView(headerView);
 
-        lvNewsInfo.setRefreshListener(new RefreshListView.RefreshListener() {
+        lvNewsInfo.setRefreshListener(new RefreshListView.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 getNewsInfoFromService(mUrl);
@@ -126,7 +135,11 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
 
             @Override
             public void onLoadMore() {
-                getNewsDataMoreFromService(mMoreUrl);
+                if ( mMoreUrl != null ) {
+                    getNewsDataMoreFromService(mMoreUrl);
+                } else {
+                    mHandler.sendEmptyMessage(CODE_NO_MORE_URL);
+                }
             }
         });
 
@@ -137,27 +150,22 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                 TextView tvTitle = (TextView) view.findViewById(R.id.tv_news_title);
                 tvTitle.setTextColor(Color.GRAY);
                 String readItem = PreferenUtils.getReadItem(mActivity);
-
                 if ( TextUtils.isEmpty(readItem) || !readItem.contains(mNewsInfoList.get(position).id) ) {
                     PreferenUtils.putReadItem(mActivity, mNewsInfoList.get(position).id);
                 }
-
                 Intent intent = new Intent(mActivity, NewsDetailActivity.class);
                 intent.putExtra("url", url);
                 mActivity.startActivity(intent);
             }
         });
-
-
         return view;
-
     }
 
     @Override
     public void initData() {
         String cache = CacheUtils.getCache(mActivity, MD5Utils.encode(mUrl));
         if ( !TextUtils.isEmpty(cache) ) {
-            parseNewsInfoData(cache);
+            parseNewsInfoData(cache, false);
         }
         getNewsInfoFromService(mUrl);
     }
@@ -167,52 +175,63 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         HttpUtils.requestHttp(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(CODE_SERVICE_REQUEST_ERROR);
-
+                mHandler.sendEmptyMessageDelayed(CODE_SERVICE_REQUEST_ERROR, 500);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if ( response.isSuccessful() && response.code() == 200 ) {
                     String result = response.body().string();
-                    parseNewsInfoData(result);
+                    parseNewsInfoData(result, false);
                     CacheUtils.putCache(mActivity, MD5Utils.encode(url), result);
                 } else {
                     Log.e(TAG, "...." + response.code());
                     mHandler.sendEmptyMessage(CODE_SERVICE_RESPONSE_ERROR);
                 }
+
             }
         });
     }
 
+    //从服务器请求下一页数据
     private void getNewsDataMoreFromService(String moreUrl) {
         HttpUtils.requestHttp(moreUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 mHandler.sendEmptyMessage(CODE_SERVICE_REQUEST_ERROR);
+
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if ( response.isSuccessful() && response.code() == 200 ) {
                     String result = response.body().string();
-
+                    parseNewsInfoData(result, true);
+                } else {
+                    mHandler.sendEmptyMessageDelayed(CODE_SERVICE_RESPONSE_ERROR, 500);
                 }
             }
         });
     }
 
     //解析从服务器获取到的数据
-    private void parseNewsInfoData(String result) {
+    private void parseNewsInfoData(String result, boolean isMore) {
         Gson gson = new Gson();
         newsDetailInfoBean = gson.fromJson(result, NewsDetailInfoBean.class);
-        mNewsInfoList = newsDetailInfoBean.data.news;
         String more = newsDetailInfoBean.data.more;
-        if ( more != null )
+        if ( !TextUtils.isEmpty(more) ) {
             mMoreUrl = GlobalContants.SERVICE_HTTP + more;
-        mTopNewsInfoList = newsDetailInfoBean.data.topnews;
+        } else {
+            mMoreUrl = null;
+        }
+        if ( !isMore ) {
+            mNewsInfoList = newsDetailInfoBean.data.news;
+            mTopNewsInfoList = newsDetailInfoBean.data.topnews;
+        } else {
+            mNewsInfoList.addAll(newsDetailInfoBean.data.news);
+        }
+        mHandler.sendEmptyMessageDelayed(CODE_DATAS_OK, 500);
 
-        mHandler.sendEmptyMessage(CODE_DATAS_OK);
     }
 
     @Override

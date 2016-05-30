@@ -39,8 +39,8 @@ public class NewsDetailActivity extends Activity implements View.OnClickListener
         //获取到webview的设置
         mWebViewSettings = mWebView.getSettings();
         mWebViewSettings.setJavaScriptEnabled(true);//设置支持javaScript
-        mWebViewSettings.setBuiltInZoomControls(true);//支持放大和缩小
-        mWebViewSettings.setDisplayZoomControls(true);
+//        mWebViewSettings.setBuiltInZoomControls(true);//支持放大和缩小
+//        mWebViewSettings.setDisplayZoomControls(true);
         mWebViewSettings.setUseWideViewPort(true);  //支持双击缩放
         mWebView.loadUrl(url);//webview加载url
     }

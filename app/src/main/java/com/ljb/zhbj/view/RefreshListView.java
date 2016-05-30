@@ -90,6 +90,7 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
 
         tvRefreshdate.setText("最后刷新时间:" + getCurrentTime());
         initArrowAnimation();
+        setRefreshState();
     }
 
     private void initRefreshFooter() {
@@ -101,6 +102,7 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
         setOnScrollListener(this);
     }
 
+    //箭头的动画
     private void initArrowAnimation() {
         rotateUp = new RotateAnimation(0, -180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         rotateUp.setDuration(200);
@@ -147,22 +149,22 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
 //                Log.e(TAG, "滑动距离为：" + dis + "结束位置和开始位置：" + endY + ":" + startY);
                 break;
             case MotionEvent.ACTION_UP:
-                if ( mCurrentState == STATE_RELEASE_REFRESH ) {
-                    mCurrentState = STATE_REFRESHING;
-                    mHeaderView.setPadding(0, 0, 0, 0);
-                    if ( mListener != null ) {
-                        mListener.onRefresh();
+                if ( dis > 0 && getFirstVisiblePosition() == 0 ) {
+                    if ( mCurrentState == STATE_RELEASE_REFRESH ) {
+                        mCurrentState = STATE_REFRESHING;
+                        mHeaderView.setPadding(0, 0, 0, 0);
+                        setRefreshState();
+                        if ( mRefreshListener != null ) {
+                            mRefreshListener.onRefresh();
+                        }
+                    } else if ( mCurrentState == STATE_PULL_REFRESH ) {
+                        setRefreshState();
+                        mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
+                    } else if ( mCurrentState == STATE_REFRESHING ) {
+                        break;
                     }
-                    setRefreshState();
-                } else if ( mCurrentState == STATE_PULL_REFRESH ) {
-                    setRefreshState();
-                    mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
-                } else if ( mCurrentState == STATE_REFRESHING ) {
-                    break;
+                    startY = -1;
                 }
-
-
-                startY = -1;
                 break;
         }
         return super.onTouchEvent(ev);
@@ -192,11 +194,20 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
         }
     }
 
-    private RefreshListener mListener;
+    //监听刷新的接口
+    public interface OnRefreshListener {
+        //下拉刷新
+        void onRefresh();
+
+        //加载更多
+        void onLoadMore();
+    }
+
+    private OnRefreshListener mRefreshListener;
 
     //给listview设置刷新监听
-    public void setRefreshListener(RefreshListener listener) {
-        mListener = listener;
+    public void setRefreshListener(OnRefreshListener listener) {
+        mRefreshListener = listener;
     }
 
     @Override
@@ -205,8 +216,8 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
             if ( getLastVisiblePosition() == getCount() - 1 && !isLoderMore ) {
                 mFooterView.setPadding(0, 0, 0, 0);
                 setSelection(getCount() - 1);
-                if ( mListener != null ) {
-                    mListener.onLoadMore();
+                if ( mRefreshListener != null ) {
+                    mRefreshListener.onLoadMore();
                 }
                 isLoderMore = true;
             }
@@ -218,51 +229,12 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
 
     }
 
+    //重写listview的onItemClick方法，把header全部都去掉。不去掉的话，会出现点击以后，当前位置+2的情况
     @Override
     public void onItemClick(AdapterView< ? > parent, View view, int position, long id) {
-        if ( mListener != null ) {
+        if ( mRefreshListener != null ) {
             mOnItemClickListener.onItemClick(parent, view, position - getHeaderViewsCount(), id);
         }
-    }
-
-    //监听刷新的接口
-    public interface RefreshListener {
-        void onRefresh();
-
-        void onLoadMore();
-    }
-
-    public void refreshComplete(boolean success) {
-        if ( isLoderMore ) {
-            mFooterView.setPadding(0, -mFooterViewHeight, 0, 0);
-            isLoderMore = false;
-        } else {
-            tvRefreshtitle.setText("下拉刷新");
-            mCurrentState = STATE_PULL_REFRESH;
-            pbProgress.clearAnimation();
-            pbProgress.setVisibility(View.INVISIBLE);
-            ivRefreshArrow.setVisibility(View.VISIBLE);
-            mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
-            if ( success ) {
-                tvRefreshdate.setText("最后刷新时间:" + getCurrentTime());
-            }
-        }
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return super.dispatchTouchEvent(ev);
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return super.onInterceptTouchEvent(ev);
-    }
-
-    //获取当前时间
-    private String getCurrentTime() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return format.format(new Date());
     }
 
     OnItemClickListener mOnItemClickListener;
@@ -271,5 +243,42 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
         super.setOnItemClickListener(this);
         mOnItemClickListener = listener;
     }
+
+
+    public void refreshComplete(boolean success) {
+        if ( isLoderMore ) {
+            mFooterView.setPadding(0, -mFooterViewHeight, 0, 0);
+            isLoderMore = false;
+        } else {
+            mCurrentState = STATE_PULL_REFRESH;
+            if ( success ) {
+                tvRefreshtitle.setText("刷新成功");
+                tvRefreshdate.setText("最后刷新时间:" + getCurrentTime());
+
+            } else {
+                tvRefreshtitle.setText("刷新失败");
+            }
+            pbProgress.clearAnimation();
+            pbProgress.setVisibility(View.INVISIBLE);
+            ivRefreshArrow.setVisibility(View.INVISIBLE);
+            mHeaderView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    hideHeaderView();
+                }
+            }, 1000);
+        }
+    }
+
+    private void hideHeaderView() {
+        mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
+    }
+
+    //获取当前时间
+    private String getCurrentTime() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return format.format(new Date());
+    }
+
 
 }
