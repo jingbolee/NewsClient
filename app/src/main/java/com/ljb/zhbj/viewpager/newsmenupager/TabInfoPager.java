@@ -51,9 +51,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     public static final int CODE_DATAS_OK = 0;
     public static final int CODE_SERVICE_RESPONSE_ERROR = 1;
     public static final int CODE_SERVICE_REQUEST_ERROR = 2;
-    private static final int CODE_REFRESH_OK = 4;
-    private static final int CODE_LODERMORE_OK = 5;
-    private static final int CODE_NO_MORE_URL = 6;
+    private static final int CODE_NO_MORE_URL = 4;
     private String mUrl;
     private ViewPager vpTopNews;
     private RefreshListView lvNewsInfo;
@@ -65,7 +63,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
     private TextView tvTopNewsTitle;
 
     private NewsDetailAdapter mNewsDetailAdapter;
-    private String mMoreUrl;
+    private String mMoreUrl; //加载更多的url
 
     public TabInfoPager(Activity activity, NewsMenuDataBean.NewsTab newsTab) {
         super(activity);
@@ -138,7 +136,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                 if ( mMoreUrl != null ) {
                     getNewsDataMoreFromService(mMoreUrl);
                 } else {
-                    mHandler.sendEmptyMessage(CODE_NO_MORE_URL);
+                    mHandler.sendEmptyMessageDelayed(CODE_NO_MORE_URL, 1000);
                 }
             }
         });
@@ -198,7 +196,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         HttpUtils.requestHttp(moreUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(CODE_SERVICE_REQUEST_ERROR);
+                mHandler.sendEmptyMessageDelayed(CODE_SERVICE_REQUEST_ERROR, 500);
 
             }
 
@@ -208,7 +206,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                     String result = response.body().string();
                     parseNewsInfoData(result, true);
                 } else {
-                    mHandler.sendEmptyMessageDelayed(CODE_SERVICE_RESPONSE_ERROR, 500);
+                    mHandler.sendEmptyMessage(CODE_SERVICE_RESPONSE_ERROR);
                 }
             }
         });
@@ -230,7 +228,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
         } else {
             mNewsInfoList.addAll(newsDetailInfoBean.data.news);
         }
-        mHandler.sendEmptyMessageDelayed(CODE_DATAS_OK, 500);
+        mHandler.sendEmptyMessage(CODE_DATAS_OK);
 
     }
 
