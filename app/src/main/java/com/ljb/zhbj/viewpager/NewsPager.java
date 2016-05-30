@@ -13,6 +13,7 @@ import com.ljb.zhbj.domain.NewsMenuDataBean;
 import com.ljb.zhbj.global.GlobalContants;
 import com.ljb.zhbj.utils.CacheUtils;
 import com.ljb.zhbj.utils.HttpUtils;
+import com.ljb.zhbj.utils.MD5Utils;
 import com.ljb.zhbj.viewpager.newsmenupager.BaseMenuDetailPager;
 import com.ljb.zhbj.viewpager.newsmenupager.InteractDetailPager;
 import com.ljb.zhbj.viewpager.newsmenupager.NewsDetailPager;
@@ -70,7 +71,8 @@ public class NewsPager extends BasePager {
     public void initData() {
         super.initData();
         setSlidingMenuShow(true);
-        String cache = CacheUtils.getCache(mActivity, GlobalContants.CATEGORIES_URL);
+//        MD5Utils.encode(GlobalContants.CATEGORIES_URL)
+        String cache = CacheUtils.getCache(mActivity, MD5Utils.encode(GlobalContants.CATEGORIES_URL));
         if ( !TextUtils.isEmpty(cache) ) {
             parseMenuData(cache);
         }
@@ -93,7 +95,7 @@ public class NewsPager extends BasePager {
                     String result = response.body().string();
                     Log.e(TAG, result);
                     parseMenuData(result);
-                    CacheUtils.putCache(mActivity, GlobalContants.CATEGORIES_URL, result);
+                    CacheUtils.putCache(mActivity, MD5Utils.encode(GlobalContants.CATEGORIES_URL), result);
                 } else {
                     mHandler.sendEmptyMessage(CODE_SERVICE_RESPONSE_ERROR);
                     Log.e(TAG, "服务器返回的数据有问题:" + response.code() + " ," + response.isSuccessful());

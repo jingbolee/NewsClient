@@ -2,6 +2,7 @@ package com.ljb.zhbj.viewpager.newsmenupager;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.PagerAdapter;
@@ -26,6 +27,8 @@ import com.ljb.zhbj.utils.CacheUtils;
 import com.ljb.zhbj.utils.DensityUtils;
 import com.ljb.zhbj.utils.DrawableUtils;
 import com.ljb.zhbj.utils.HttpUtils;
+import com.ljb.zhbj.utils.MD5Utils;
+import com.ljb.zhbj.utils.PreferenUtils;
 import com.ljb.zhbj.view.RefreshListView;
 import com.ljb.zhbj.view.TopNewsViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -131,20 +134,28 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
             @Override
             public void onItemClick(AdapterView< ? > parent, View view, int position, long id) {
                 String url = mNewsInfoList.get(position).url;
+                TextView tvTitle = (TextView) view.findViewById(R.id.tv_news_title);
+                tvTitle.setTextColor(Color.GRAY);
+                String readItem = PreferenUtils.getReadItem(mActivity);
 
+                if ( TextUtils.isEmpty(readItem) || !readItem.contains(mNewsInfoList.get(position).id) ) {
+                    PreferenUtils.putReadItem(mActivity, mNewsInfoList.get(position).id);
+                }
 
                 Intent intent = new Intent(mActivity, NewsDetailActivity.class);
                 intent.putExtra("url", url);
                 mActivity.startActivity(intent);
             }
         });
+
+
         return view;
 
     }
 
     @Override
     public void initData() {
-        String cache = CacheUtils.getCache(mActivity, mUrl);
+        String cache = CacheUtils.getCache(mActivity, MD5Utils.encode(mUrl));
         if ( !TextUtils.isEmpty(cache) ) {
             parseNewsInfoData(cache);
         }
@@ -165,7 +176,7 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                 if ( response.isSuccessful() && response.code() == 200 ) {
                     String result = response.body().string();
                     parseNewsInfoData(result);
-                    CacheUtils.putCache(mActivity, url, result);
+                    CacheUtils.putCache(mActivity, MD5Utils.encode(url), result);
                 } else {
                     Log.e(TAG, "...." + response.code());
                     mHandler.sendEmptyMessage(CODE_SERVICE_RESPONSE_ERROR);
@@ -287,9 +298,18 @@ public class TabInfoPager extends BaseMenuDetailPager implements ViewPager.OnPag
                 holder = (ViewHolder) convertView.getTag();
             }
             holder.tvNewsTitle.setText(newsInfo.title);
+            String readItem = PreferenUtils.getReadItem(mActivity);
+
+            String id = newsInfo.id;
+
+            if ( !TextUtils.isEmpty(readItem) && readItem.contains(id) ) {
+                holder.tvNewsTitle.setTextColor(Color.GRAY);
+            } else {
+                holder.tvNewsTitle.setTextColor(Color.BLACK);
+            }
             holder.tvNewsData.setText(newsInfo.pubdate);
             //主动让系统去测量holder.ivNewsImage的宽和高
-            holder.ivNewsImage.measure(0, 0);
+            convertView.measure(0, 0);
             int measuredWidth = holder.ivNewsImage.getMeasuredWidth();
             int measuredHeight = holder.ivNewsImage.getMeasuredHeight();
             DrawableUtils.drawableLoader(mActivity, holder.ivNewsImage, newsInfo.listimage, measuredWidth, measuredHeight, R.drawable.pic_item_list_default);

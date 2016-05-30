@@ -33,4 +33,19 @@ public class PreferenUtils {
         SharedPreferences preferences = context.getSharedPreferences(PREFER_NAME, Context.MODE_PRIVATE);
         return preferences.getBoolean(key, defaultValue);
     }
+
+    //标记是否阅读过item
+    public static void putReadItem(Context context, String itemId) {
+        String key = "read_item";
+        SharedPreferences preferences = context.getSharedPreferences(PREFER_NAME, Context.MODE_PRIVATE);
+        String records = preferences.getString(key, null);
+        records = records + "," + itemId;
+        preferences.edit().putString(key, records).commit();
+    }
+
+    public static String getReadItem(Context context) {
+        String key = "read_item";
+        SharedPreferences preferences = context.getSharedPreferences(PREFER_NAME, Context.MODE_PRIVATE);
+        return preferences.getString(key, null);
+    }
 }

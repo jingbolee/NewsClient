@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -25,7 +26,7 @@ import java.util.Date;
  * @Date: 2016-05-26 11:38
  * @Version V1.0 <描述当前版本功能>
  */
-public class RefreshListView extends ListView implements AbsListView.OnScrollListener {
+public class RefreshListView extends ListView implements AbsListView.OnScrollListener, AdapterView.OnItemClickListener {
     private static final String TAG = "RefreshListView";
 
     private static final int STATE_PULL_REFRESH = 0; //下拉刷新
@@ -217,6 +218,13 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
 
     }
 
+    @Override
+    public void onItemClick(AdapterView< ? > parent, View view, int position, long id) {
+        if ( mListener != null ) {
+            mOnItemClickListener.onItemClick(parent, view, position - getHeaderViewsCount(), id);
+        }
+    }
+
     //监听刷新的接口
     public interface RefreshListener {
         void onRefresh();
@@ -255,6 +263,13 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
     private String getCurrentTime() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return format.format(new Date());
+    }
+
+    OnItemClickListener mOnItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        super.setOnItemClickListener(this);
+        mOnItemClickListener = listener;
     }
 
 }
